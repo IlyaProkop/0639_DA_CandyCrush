@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class UIPanelGame : MonoBehaviour,IMenu
 {
-    public Text LevelConditionView;
+    public TextMeshProUGUI LevelConditionView;
 
     [SerializeField] private Button btnPause;
     [SerializeField] private Button btnRestart;
@@ -16,7 +17,8 @@ public class UIPanelGame : MonoBehaviour,IMenu
     private void Awake()
     {
         btnPause.onClick.AddListener(OnClickPause);
-        btnRestart.onClick.AddListener(OnClickRestart);
+        //   btnRestart.onClick.AddListener(OnClickRestart);
+        Debug.Log("bntRestr");
     }
 
     private void OnClickRestart()

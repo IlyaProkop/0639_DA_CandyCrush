@@ -1,12 +1,11 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class UIMainManager : MonoBehaviour
 {
+    [SerializeField] private Camera boardCamera;
+
     private IMenu[] m_menuList;
 
     private GameManager m_gameManager;
@@ -63,13 +62,17 @@ public class UIMainManager : MonoBehaviour
                 ShowMenu<UIPanelMain>();
                 break;
             case GameManager.eStateGame.GAME_STARTED:
+                boardCamera.enabled = true;
                 ShowMenu<UIPanelGame>();
                 break;
             case GameManager.eStateGame.PAUSE:
+                boardCamera.enabled = false;
                 ShowMenu<UIPanelPause>();
                 break;
             case GameManager.eStateGame.GAME_OVER:
-                ShowMenu<UIPanelGameOver>();
+                boardCamera.enabled = false;
+                if (FindAnyObjectByType<GameModeBehaviour>().GameIsWIN()) ShowMenu<UIPanelGameOverWin>();
+                else ShowMenu<UIPanelGameOverLose>();
                 break;
         }
     }
@@ -79,18 +82,18 @@ public class UIMainManager : MonoBehaviour
         for (int i = 0; i < m_menuList.Length; i++)
         {
             IMenu menu = m_menuList[i];
-            if(menu is T)
+            if (menu is T)
             {
                 menu.Show();
             }
             else
             {
                 menu.Hide();
-            }            
+            }
         }
     }
 
-    internal Text GetLevelConditionView()
+    internal TextMeshProUGUI GetLevelConditionView()
     {
         UIPanelGame game = m_menuList.Where(x => x is UIPanelGame).Cast<UIPanelGame>().FirstOrDefault();
         if (game)

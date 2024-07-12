@@ -1,6 +1,5 @@
 ﻿using DG.Tweening;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -25,33 +24,68 @@ public class Board
 
     private int m_matchMin;
 
-    public Board(Transform transform, GameSettings gameSettings)
+    private float cellSize;
+
+    private RectTransform uiFrame; // Add a reference to the UI frame
+
+    private RectTransform uiFrameRectTransform;
+    private Canvas canvas;
+
+    public Board(Transform transform, GameSettings gameSettings, RectTransform uiFrame)
     {
         m_root = transform;
-
         m_matchMin = gameSettings.MatchesMin;
-
         this.boardSizeX = gameSettings.BoardSizeX;
         this.boardSizeY = gameSettings.BoardSizeY;
-
         m_cells = new Cell[boardSizeX, boardSizeY];
 
+        uiFrameRectTransform = uiFrame;
+        canvas = uiFrame.GetComponentInParent<Canvas>();
+
+        CalculateCellSize();
         CreateBoard();
+    }
+
+    private void CalculateCellSize()
+    {
+        // Get the corners of the UI frame in world coordinates
+        Vector3[] worldCorners = new Vector3[4];
+        uiFrameRectTransform.GetWorldCorners(worldCorners);
+
+        Vector3 bottomLeftCorner = worldCorners[0];
+        Vector3 topRightCorner = worldCorners[2];
+
+        float frameWidth = topRightCorner.x - bottomLeftCorner.x;
+        float frameHeight = topRightCorner.y - bottomLeftCorner.y;
+
+        // Calculate cell size based on the smaller dimension
+        float cellWidth = frameWidth / boardSizeX;
+        float cellHeight = frameHeight / boardSizeY;
+        cellSize = Mathf.Min(cellWidth, cellHeight);
+
+        Debug.Log($"CellSize: {cellSize}, FrameWidth: {frameWidth}, FrameHeight: {frameHeight}");
     }
 
     private void CreateBoard()
     {
-        Vector3 origin = new Vector3(-boardSizeX * 0.5f + 0.5f, -boardSizeY * 0.5f + 0.5f, 0f);
+        // Get the corners of the UI frame in world coordinates
+        Vector3[] worldCorners = new Vector3[4];
+        uiFrameRectTransform.GetWorldCorners(worldCorners);
+
+        Vector3 bottomLeftCorner = worldCorners[0];
+
+        Vector3 origin = bottomLeftCorner + new Vector3(cellSize * 0.5f, cellSize * 0.5f, 0f);
         GameObject prefabBG = Resources.Load<GameObject>(Constants.PREFAB_CELL_BACKGROUND);
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
             {
                 GameObject go = GameObject.Instantiate(prefabBG);
-                go.transform.position = origin + new Vector3(x, y, 0f);
+                go.transform.position = origin + new Vector3(x * cellSize, y * cellSize, 0f);
                 go.transform.SetParent(m_root);
 
-               // go.transform.
+                // Adjust cell scale
+                go.transform.localScale = new Vector3(cellSize, cellSize, 1f);
 
                 Cell cell = go.GetComponent<Cell>();
                 cell.Setup(x, y);
@@ -60,7 +94,7 @@ public class Board
             }
         }
 
-        //set neighbours
+        // Set neighbours
         for (int x = 0; x < boardSizeX; x++)
         {
             for (int y = 0; y < boardSizeY; y++)
@@ -71,7 +105,6 @@ public class Board
                 if (x > 0) m_cells[x, y].NeighbourLeft = m_cells[x - 1, y];
             }
         }
-
     }
 
     internal void Fill()
@@ -103,7 +136,7 @@ public class Board
                 }
 
                 item.SetType(Utils.GetRandomNormalTypeExcept(types.ToArray()));
-                item.SetView();
+                item.SetView(cellSize);
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
@@ -139,7 +172,7 @@ public class Board
 
 
     internal void FillGapsWithNewItems()
-    { 
+    {
         //for (int x = 0; x < boardSizeX; x++)
         //{
         //    for (int y = 0; y < boardSizeY; y++)
@@ -184,9 +217,9 @@ public class Board
             }
         }
         Array values = Enum.GetValues(typeof(NormalItem.eNormalType));
-        foreach(var type in values)
+        foreach (var type in values)
         {
-            if(!amountTypeOnBoard.ContainsKey((NormalItem.eNormalType)type))
+            if (!amountTypeOnBoard.ContainsKey((NormalItem.eNormalType)type))
             {
                 amountTypeOnBoard.Add((NormalItem.eNormalType)type, 0);
             }
@@ -202,7 +235,7 @@ public class Board
                 Cell cell = m_cells[x, y];
                 if (!cell.IsEmpty) continue;
                 surroundTypes.Clear();
-                if(cell.NeighbourBottom != null && cell.NeighbourBottom.Item != null)
+                if (cell.NeighbourBottom != null && cell.NeighbourBottom.Item != null)
                 {
                     surroundTypes.Add((cell.NeighbourBottom.Item as NormalItem).ItemType);
                 }
@@ -223,7 +256,7 @@ public class Board
                 NormalItem item = new NormalItem();
 
                 item.SetType(minType);
-                item.SetView();
+                item.SetView(cellSize);
                 item.SetViewRoot(m_root);
 
                 cell.Assign(item);
@@ -236,9 +269,9 @@ public class Board
     {
         int count = int.MaxValue;
         NormalItem.eNormalType minType = NormalItem.eNormalType.TYPE_ONE;
-        foreach(var countItem in amountTypeOnBoard)
+        foreach (var countItem in amountTypeOnBoard)
         {
-            if(!surroundTypes.Contains(countItem.Key) && count > countItem.Value)
+            if (!surroundTypes.Contains(countItem.Key) && count > countItem.Value)
             {
                 count = countItem.Value;
                 minType = countItem.Key;
@@ -373,7 +406,7 @@ public class Board
                 cellToConvert = matches[rnd];
             }
 
-            item.SetView();
+            item.SetView(cellSize);
             item.SetViewRoot(m_root);
 
             cellToConvert.Free();
@@ -441,7 +474,7 @@ public class Board
         var dir = GetMatchDirection(matches);
 
         var bonus = matches.Where(x => x.Item is BonusItem).FirstOrDefault();
-        if(bonus == null)
+        if (bonus == null)
         {
             return matches;
         }

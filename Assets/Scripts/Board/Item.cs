@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using System.Runtime.CompilerServices;
 
 [Serializable]
 public class Item
@@ -12,7 +13,7 @@ public class Item
     public Transform View { get; private set; }
 
 
-    public virtual void SetView()
+    public virtual void SetView(float cellSize)
     {
         string prefabname = GetPrefabName();
 
@@ -23,6 +24,7 @@ public class Item
             {
                 //View = GameObject.Instantiate(prefab).transform;
                 GameObject gameObject = SmartPool.Instance.Spawn(prefab, Vector3.zero, Quaternion.identity);
+                gameObject.transform.localScale = new Vector3(cellSize, cellSize, 1f);
                 View = gameObject.transform;
                 
             }

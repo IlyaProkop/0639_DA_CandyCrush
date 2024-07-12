@@ -49,6 +49,8 @@ public class GameManager : MonoBehaviour
 
     [SerializeField] TypeSkin typeSkin;
 
+    [SerializeField] RectTransform boardSize;
+
     private void Awake()
     {
         State = eStateGame.SETUP;
@@ -105,7 +107,8 @@ public class GameManager : MonoBehaviour
     public void LoadLevel(eLevelMode mode)
     {
         m_boardController = new GameObject("BoardController").AddComponent<BoardController>();
-        m_boardController.StartGame(this, m_gameSettings);
+        m_boardController.gameObject.layer = LayerMask.NameToLayer("Board");
+        m_boardController.StartGame(this, m_gameSettings, boardSize);
 
         if (mode == eLevelMode.MOVES)
         {

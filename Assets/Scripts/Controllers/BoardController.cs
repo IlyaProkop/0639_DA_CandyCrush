@@ -31,7 +31,7 @@ public class BoardController : MonoBehaviour
 
     private bool m_gameOver;
 
-    public void StartGame(GameManager gameManager, GameSettings gameSettings)
+    public void StartGame(GameManager gameManager, GameSettings gameSettings, RectTransform boardSize)
     {
         m_gameManager = gameManager;
 
@@ -41,7 +41,8 @@ public class BoardController : MonoBehaviour
 
         m_cam = Camera.main;
 
-        m_board = new Board(this.transform, gameSettings);
+
+        m_board = new Board(this.transform, gameSettings, boardSize);
 
         Fill();
     }
@@ -170,6 +171,7 @@ public class BoardController : MonoBehaviour
             {
                 OnMoveEvent();
 
+                FindAnyObjectByType<GameModeBehaviour>().GameScore += matches.Count;
                 CollapseMatches(matches, cell2);
             }
         }
@@ -181,6 +183,7 @@ public class BoardController : MonoBehaviour
 
         if (matches.Count > 0)
         {
+            FindAnyObjectByType<GameModeBehaviour>().GameScore += matches.Count*2;
             CollapseMatches(matches, null);
         }
         else
@@ -219,6 +222,7 @@ public class BoardController : MonoBehaviour
 
     private void CollapseMatches(List<Cell> matches, Cell cellEnd)
     {
+
         for (int i = 0; i < matches.Count; i++)
         {
             matches[i].ExplodeItem();
@@ -228,7 +232,7 @@ public class BoardController : MonoBehaviour
         {
             m_board.ConvertNormalToBonus(matches, cellEnd);
         }
-
+        
         StartCoroutine(ShiftDownItemsCoroutine());
     }
 

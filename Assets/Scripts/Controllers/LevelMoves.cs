@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,7 +11,7 @@ public class LevelMoves : LevelCondition
 
     private BoardController m_board;
 
-    public override void Setup(float value, Text txt, BoardController board)
+    public override void Setup(float value, TextMeshProUGUI txt, BoardController board)
     {
         base.Setup(value, txt);
 

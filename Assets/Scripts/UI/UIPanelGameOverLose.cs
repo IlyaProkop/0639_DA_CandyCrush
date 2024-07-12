@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UIPanelGameOverWin : MonoBehaviour, IMenu
+public class UIPanelGameOverLose : MonoBehaviour, IMenu
 {
     [SerializeField] private Button btnClose;
     [SerializeField] private TextMeshProUGUI scoreText;
