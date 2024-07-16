@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -27,6 +28,7 @@ public class ScoreController : MonoBehaviour
 
     private void Start()
     {
+        PlayerPrefs.SetInt(scoreDATA, 0);
         Score = PlayerPrefs.GetInt(scoreDATA);
     }
 }

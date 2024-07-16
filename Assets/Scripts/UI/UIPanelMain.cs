@@ -15,7 +15,7 @@ public class UIPanelMain : MonoBehaviour, IMenu
     private void Awake()
     {
         btnMoves.onClick.AddListener(OnClickMoves);
-        btnTimer.onClick.AddListener(OnClickTimer);
+        btnTimer.onClick.AddListener(OnClickTimerWithAnimation);
     }
 
     private void OnDestroy()
@@ -28,9 +28,15 @@ public class UIPanelMain : MonoBehaviour, IMenu
     {
         m_mngr = mngr;
     }
+    private void OnClickTimerWithAnimation()
+    {
+        GetComponent<MainPanelAnimation>().PlayReverseAnimation(OnClickTimer);
+       // mainPanelAnimation.
+    }
 
     private void OnClickTimer()
     {
+        Debug.Log("3");
         m_mngr.LoadLevelTimer();
     }
 
