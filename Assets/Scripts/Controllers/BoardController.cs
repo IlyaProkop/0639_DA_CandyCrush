@@ -172,11 +172,18 @@ public class BoardController : MonoBehaviour
                 OnMoveEvent();
 
                 FindAnyObjectByType<GameModeBehaviour>().GameScore += matches.Count;
+
+                NormalItem a = matches[0].Item as NormalItem;
+                if (FindAnyObjectByType<AimController>().Check(a.ItemType)) FindAnyObjectByType<GameModeBehaviour>().GameScore += matches.Count * 100;
+
+
                 CollapseMatches(matches, cell2);
+                
+                Debug.Log("ItemType: "+a.ItemType);
             }
         }
     }
-
+ 
     private void FindMatchesAndCollapse()
     {
         List<Cell> matches = m_board.FindFirstMatch();
@@ -227,9 +234,9 @@ public class BoardController : MonoBehaviour
         {
             matches[i].ExplodeItem();
         }
-
-        if(matches.Count > m_gameSettings.MatchesMin)
+        if (matches.Count > m_gameSettings.MatchesMin)
         {
+           // if (cellEnd.BoardY > 6) return;
             m_board.ConvertNormalToBonus(matches, cellEnd);
         }
         
