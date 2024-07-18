@@ -8,12 +8,16 @@ public class PanelGameOverWinAnimation : MonoBehaviour
     [SerializeField] GameObject scoreText;
     [SerializeField] GameObject settingButtons;
     [SerializeField] GameObject restartButtons;
+    [SerializeField] GameObject heroIcon;
+    [SerializeField] GameObject coolBtn;
 
     private Vector3 winnerImgStartPos;
     private Vector3 newRecordImgStartPos;
     private Vector3 scoreTextStartPos;
     private Vector3 settingButtonsStartPos;
     private Vector3 restartButtonsStartPos;
+    private Vector3 heroIconStartScale;
+    private Vector3 coolBtnStartScale;
 
     private void Awake()
     {
@@ -23,6 +27,8 @@ public class PanelGameOverWinAnimation : MonoBehaviour
         scoreTextStartPos = scoreText.transform.position;
         settingButtonsStartPos = settingButtons.transform.position;
         restartButtonsStartPos = restartButtons.transform.position;
+        heroIconStartScale = heroIcon.transform.localScale;
+        coolBtnStartScale = coolBtn.transform.localScale;
     }
 
     private void OnEnable()
@@ -30,10 +36,29 @@ public class PanelGameOverWinAnimation : MonoBehaviour
         // Animate elements in sequence
         Sequence sequence = DOTween.Sequence();
 
+        coolBtn.transform.DOScale(coolBtnStartScale * 1.1f, 0.5f).SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+
         // Animate winnerImg: move from top
-        sequence.Append(winnerImg.transform.DOMoveY(winnerImgStartPos.y, 0.5f)  // Уменьшаем длительность до 0.5 секунды
+        sequence.Join(winnerImg.transform.DOMoveY(winnerImgStartPos.y, 0.5f)  // Уменьшаем длительность до 0.5 секунды
             .SetEase(Ease.OutQuad)
             .From(new Vector3(winnerImgStartPos.x, winnerImgStartPos.y + Screen.height, winnerImgStartPos.z)));
+
+        // Animate settingButtons: move from left
+        sequence.Join(settingButtons.transform.DOMoveX(settingButtonsStartPos.x, 0.5f)  // Уменьшаем длительность до 0.5 секунды
+            .SetEase(Ease.OutQuad)
+            .From(new Vector3(settingButtonsStartPos.x - Screen.width, settingButtonsStartPos.y, settingButtonsStartPos.z)));
+
+        // Animate restartButtons: move from right
+        sequence.Join(restartButtons.transform.DOMoveX(restartButtonsStartPos.x, 0.5f)  // Уменьшаем длительность до 0.5 секунды
+            .SetEase(Ease.OutQuad)
+            .From(new Vector3(restartButtonsStartPos.x + Screen.width, restartButtonsStartPos.y, restartButtonsStartPos.z)));
+
+
+        // Animate heroIcon: scale from 0 to original size
+        heroIcon.transform.localScale = Vector3.zero;
+        sequence.Join(heroIcon.transform.DOScale(heroIconStartScale, 0.5f)
+            .SetEase(Ease.OutBack));
+
 
         // Animate newRecordImg: move from right
         sequence.Append(newRecordImg.transform.DOMoveX(newRecordImgStartPos.x, 0.5f)  // Уменьшаем длительность до 0.5 секунды
@@ -44,16 +69,6 @@ public class PanelGameOverWinAnimation : MonoBehaviour
         sequence.Append(scoreText.transform.DOMove(scoreTextStartPos, 0.5f)  // Уменьшаем длительность до 0.5 секунды
             .SetEase(Ease.OutBounce)
             .From(new Vector3(scoreTextStartPos.x, scoreTextStartPos.y + Screen.height, scoreTextStartPos.z)));
-
-        // Animate settingButtons: move from left
-        sequence.Append(settingButtons.transform.DOMoveX(settingButtonsStartPos.x, 0.5f)  // Уменьшаем длительность до 0.5 секунды
-            .SetEase(Ease.OutQuad)
-            .From(new Vector3(settingButtonsStartPos.x - Screen.width, settingButtonsStartPos.y, settingButtonsStartPos.z)));
-
-        // Animate restartButtons: move from right
-        sequence.Append(restartButtons.transform.DOMoveX(restartButtonsStartPos.x, 0.5f)  // Уменьшаем длительность до 0.5 секунды
-            .SetEase(Ease.OutQuad)
-            .From(new Vector3(restartButtonsStartPos.x + Screen.width, restartButtonsStartPos.y, restartButtonsStartPos.z)));
 
         // Play the sequence
         sequence.Play();

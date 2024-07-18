@@ -10,6 +10,8 @@ public class GameModeBehaviour : MonoBehaviour
         ScoreController scoreController = FindAnyObjectByType<ScoreController>();
         bool isTrue = GameScore > scoreController.Score;
         if (isTrue) scoreController.Score = GameScore;
+
+        return true;
         return isTrue;
     }
 
@@ -35,4 +37,5 @@ public class GameModeBehaviour : MonoBehaviour
     {
         GameScore = 0;
     }
+
 }
